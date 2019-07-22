@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postgres-airflow
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        environtment: development
+        name: postgres-airflow
+    spec:
+      containers:
+      - name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: airflow
+        - name: POSTGRES_PASSWORD
+          value: airflow
+        - name: POSTGRES_USER
+          value: airflow
+        image: postgres:9.6
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: dbvol
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: dbvol
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-airflow
+spec:
+  clusterIP: None
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    name: postgres-airflow

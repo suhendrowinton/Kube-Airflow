@@ -1,0 +1,60 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: airflow-webserver
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        environtment: development
+        name: airflow-webserver
+    spec:
+      containers:
+      - env:
+        - name: EXECUTOR
+          value: Kubernetes
+        - name: LOAD_EX
+          value: "n"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: airflow-secrets
+              key: user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: airflow-secrets
+              key: password
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              name: airflow-secrets
+              key: host
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_DB
+          value: "airflow"
+        - name: AIRFLOW__KUBERNETES__DAGS_VOLUME_CLAIM
+          value: airflow-dags
+        - name: AIRFLOW__KUBERNETES__LOGS_VOLUME_CLAIM
+          value: airflow-logs
+        image: puckel/docker-airflow:1.10.3.1
+        name: airflow-webserver
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /usr/local/airflow/dags
+          name: airflow-dags
+        - mountPath: /usr/local/airflow/logs
+          name: airflow-logs
+      restartPolicy: Always
+      volumes:
+      - name: airflow-dags
+        persistentVolumeClaim:
+          claimName: airflow-dags
+      - name: airflow-logs
+        persistentVolumeClaim:
+          claimName: airflow-logs
