@@ -58,3 +58,15 @@ spec:
       - name: airflow-logs
         persistentVolumeClaim:
           claimName: airflow-logs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-webserver
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    name: airflow-webserver
+  type: NodePort

@@ -13,7 +13,6 @@ echo '------- Running kubectl get pvc -------'
 sudo kubectl get pvc
 sudo kubectl apply -f postgres-deployment.yaml
 sudo kubectl apply -f webserver-deployment.yaml
-sudo kubectl expose deployment airflow-webserver --type=NodePort --name=airflow-webserver
 sudo kubectl apply -f scheduler-deployment.yaml
 # wait for up to 10 minutes for everything to be deployed
 PODS_ARE_READY=0
